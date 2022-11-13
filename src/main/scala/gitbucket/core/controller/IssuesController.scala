@@ -156,6 +156,7 @@ trait IssuesControllerBase extends ControllerBase {
           // Insert custom field values
           params.toMap.foreach {
             case (key, value) =>
+              println(key + "=" + value)
               if (key.startsWith("custom-field-")) {
                 getCustomField(
                   repository.owner,
