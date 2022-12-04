@@ -16,7 +16,9 @@ pipeline {
             }
         }
         stage('Build WAR file') {
-            sh "sbt executable"
+            steps {
+                sh "sbt executable"
+            }
         }
         stage('Deploy') {
             when {
