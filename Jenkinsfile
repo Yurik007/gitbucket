@@ -18,6 +18,7 @@ pipeline {
         stage('Build WAR file') {
             steps {
                 sh "sbt executable"
+                archiveArtifacts artifacts: 'target/executable/*.war', fingerprint: true
             }
         }
         stage('Deploy') {
