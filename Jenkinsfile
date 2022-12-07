@@ -58,9 +58,9 @@ pipeline {
             }
         }
         stage('Deploy') {
-            // when {
-            //     branch "master"
-            // }
+            when {
+                branch "master"
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'AWS Beanstalk CLI', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                         sh """export AWS_DEFAULT_REGION=eu-central-1
