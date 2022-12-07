@@ -62,7 +62,7 @@ pipeline {
             //     branch "master"
             // }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'AWS Beanstalk CLI', passwordVariable: 'AWS_ACCESS_KEY_ID', usernameVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'AWS Beanstalk CLI', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                         sh """export AWS_DEFAULT_REGION=eu-central-1
                         aws s3 cp target/executable/gitbucket.war s3://elasticbeanstalk-eu-central-1-618727779669/GitBucket/gitbucket-${BUILD_NUMBER}.war
                         aws elasticbeanstalk create-application-version --application-name GitBucket --version-label gitbucket-${BUILD_NUMBER} --source-bundle S3Bucket=elasticbeanstalk-eu-central-1-618727779669,S3Key=GitBucket/gitbucket-${BUILD_NUMBER}.war
