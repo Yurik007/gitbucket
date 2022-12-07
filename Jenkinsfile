@@ -38,21 +38,22 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner -Dsonar.sourceEncoding=UTF-8 \\
                         -Dsonar.projectKey=gitbucket \\
                         -Dsonar.projectName=gitbucket \\
-                        -Dsonar.scala.coverage.reportPaths=target/scala-2.13/scoverage-report/scoverage.xml \\
-                        -Dsonar.branch.name=${BRANCH}"""
+                        -Dsonar.exclusions=**/*.java \\
+                        -Dsonar.scala.coverage.reportPaths=target/scala-2.13/scoverage-report/scoverage.xml"""
                     }
 
-                    // timeout(time: 5, unit: 'MINUTES') {
-                    //     def qg = waitForQualityGate()
-                    //     currentBuild.description = "Quality Gate ${qg.status}"
-                    //     if (qg.status != "OK") {
-                    //         if (env.BRANCH_NAME != 'master') {
-                    //             unstable "Quality Gate ${qg.status}. Please, address new issues"
-                    //         } else {
-                    //             failure "Quality Gate ${qg.status}. Please, address new issues"
-                    //         }
-                    //     }
-                    // }
+                    timeout(time: 5, unit: 'MINUTES') {
+                        sleep 15
+                        def qg = waitForQualityGate()
+                        currentBuild.description = "Quality Gate ${qg.status}"
+                        if (qg.status != "OK") {
+                            if (env.BRANCH_NAME != 'master') {
+                                unstable "Quality Gate ${qg.status}. Please, address new issues"
+                            } else {
+                                failure "Quality Gate ${qg.status}. Please, address new issues"
+                            }
+                        }
+                    }
                 }
             }
         }
