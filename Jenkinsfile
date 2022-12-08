@@ -47,10 +47,10 @@ pipeline {
                         def qg = waitForQualityGate()
                         currentBuild.description = "Quality Gate ${qg.status}"
                         if (qg.status != "OK") {
-                            if (env.BRANCH_NAME != 'master') {
+                            if (env.BRANCH != 'master') {
                                 unstable "Quality Gate ${qg.status}. Please, address new issues"
                             } else {
-                                failure "Quality Gate ${qg.status}. Please, address new issues"
+                                error "Quality Gate ${qg.status}. Please, address new issues"
                             }
                         }
                     }
@@ -58,16 +58,17 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when {
-                branch "master"
-            }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'AWS Beanstalk CLI', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                        sh """export AWS_DEFAULT_REGION=eu-central-1
-                        aws s3 cp target/executable/gitbucket.war s3://elasticbeanstalk-eu-central-1-618727779669/GitBucket/gitbucket-${BUILD_NUMBER}.war
-                        aws elasticbeanstalk create-application-version --application-name GitBucket --version-label gitbucket-${BUILD_NUMBER} --source-bundle S3Bucket=elasticbeanstalk-eu-central-1-618727779669,S3Key=GitBucket/gitbucket-${BUILD_NUMBER}.war
-                        aws elasticbeanstalk update-environment --application-name GitBucket --environment-name Gitbucket-env --version-label gitbucket-${BUILD_NUMBER}
-                        """
+                script {
+                    if (env.BRANCH == 'master') {
+                        withCredentials([usernamePassword(credentialsId: 'AWS Beanstalk CLI', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                                sh """export AWS_DEFAULT_REGION=eu-central-1
+                                aws s3 cp target/executable/gitbucket.war s3://elasticbeanstalk-eu-central-1-618727779669/GitBucket/gitbucket-${BUILD_NUMBER}.war
+                                aws elasticbeanstalk create-application-version --application-name GitBucket --version-label gitbucket-${BUILD_NUMBER} --source-bundle S3Bucket=elasticbeanstalk-eu-central-1-618727779669,S3Key=GitBucket/gitbucket-${BUILD_NUMBER}.war
+                                aws elasticbeanstalk update-environment --application-name GitBucket --environment-name Gitbucket-env --version-label gitbucket-${BUILD_NUMBER}
+                                """
+                        }
+                    }
                 }
             }
         }
